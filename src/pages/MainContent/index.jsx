@@ -1,17 +1,20 @@
 import { useState } from "react";
 
+import * as data from "../../sample-data.json";
+
 import {
   Box,
   Button,
   Card,
   CardContent,
   Grid,
+  TextareaAutosize,
   Typography,
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 
 import { OutItemsTable } from "../../components/OutItemsTable";
-import { Packaging } from "../../algorithm/Packaging";
+import { PackingLogic } from "../../packingLogic/packingLogic";
 
 let styles = {
   box: {
@@ -28,24 +31,43 @@ export const MainContent = ({ items }) => {
   const [viewRest, setViewRest] = useState(false);
   const [restItems, setRestItems] = useState({});
 
+  const defaultJSON = {};
+
   const createHtmlElement = (elements, box) => {
     elements.forEach((element) => {
       let div = document.createElement("div");
       div.setAttribute(
         "style",
         `left:${element.x}px; top:${element.y}px; width:${element.width}px; height:${element.height}px; 
-      background-color:green; border-radius:4px; position: absolute`
+      background-color:#7AB956; border-radius:4px; position: absolute; box-sizing: border-box;
+      border: 1px solid #FFFFFF;`
       );
 
       box.appendChild(div);
     });
   };
 
+  const parseTextArea = () => {
+    const area = document.getElementById("#area");
+
+    try {
+      return JSON.parse(area.value);
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        alert("There was a syntax error. Please correct it and try again: ");
+      } else {
+        throw error;
+      }
+    }
+  };
+
   const onClick = () => {
+
+
     let box = document.getElementById("#box");
     let coordinates = box.getBoundingClientRect();
 
-    let resultBoxes = Packaging(
+    let resultBoxes = PackingLogic(
       items.grill.grillItems,
       items.grill.width,
       items.grill.height,
@@ -84,6 +106,15 @@ export const MainContent = ({ items }) => {
                 </CardContent>
               </Card>
             </Grid>
+            <Grid item lg={5} xs={5} style={{ display: "grid" }}>
+              <TextareaAutosize
+                id="#area"
+                fullWith
+                rowsMin={30}
+                placeholder="Enter your JSON"
+                defaultValue={JSON.stringify(data, null, 2)}
+              ></TextareaAutosize>
+            </Grid>
           </Grid>
         </CardContent>
       </Card>
@@ -92,5 +123,5 @@ export const MainContent = ({ items }) => {
 };
 
 MainContent.propTypes = {
-  items: PropTypes.arrayOf(Object).isRequired,
+  items: PropTypes.object.isRequired,
 };

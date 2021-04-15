@@ -1,4 +1,7 @@
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
+
+
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -25,7 +28,7 @@ export function OutItemsTable({ items }) {
       <TableBody>
         {items?items.map((item) => {
           return (
-            <TableRow>
+            <TableRow key={uuidv4()}>
               <TableCell>{item.title}</TableCell>
               <TableCell>{`${item.width}x${item.height}`}</TableCell>
               <TableCell>{item.count}</TableCell>
