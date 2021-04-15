@@ -31,8 +31,6 @@ export const MainContent = ({ items }) => {
   const [viewRest, setViewRest] = useState(false);
   const [restItems, setRestItems] = useState({});
 
-  const defaultJSON = {};
-
   const createHtmlElement = (elements, box) => {
     elements.forEach((element) => {
       let div = document.createElement("div");
@@ -49,28 +47,47 @@ export const MainContent = ({ items }) => {
 
   const parseTextArea = () => {
     const area = document.getElementById("#area");
-
+    debugger;
     try {
-      return JSON.parse(area.value);
-    } catch (error) {
-      if (error instanceof SyntaxError) {
-        alert("There was a syntax error. Please correct it and try again: ");
+      debugger;
+      const data = JSON.parse(area.value).default;
+      debugger;
+      if (data instanceof Object) {
+        debugger;
+        return data;
       } else {
-        throw error;
+        debugger;
+        throw new Error();
       }
+    } catch (error) {
+      throw error;
     }
   };
 
   const onClick = () => {
+    let mainData;
+    let grillItems;
+    let width;
+    let height;
+    const box = document.getElementById("#box");
+    const coordinates = box.getBoundingClientRect();
 
+    try {
+      mainData = parseTextArea();
+      grillItems = mainData.grill.grillItems;
+      width = mainData.grill.width;
+      height = mainData.grill.height;
+    } catch {
+      alert("There was a syntax error! We take the default data.");
+      grillItems = items.grill.grillItems;
+      width = items.grill.width;
+      height = items.grill.height;
+    }
 
-    let box = document.getElementById("#box");
-    let coordinates = box.getBoundingClientRect();
-
-    let resultBoxes = PackingLogic(
-      items.grill.grillItems,
-      items.grill.width,
-      items.grill.height,
+    const resultBoxes = PackingLogic(
+      grillItems,
+      width,
+      height,
       coordinates.x,
       coordinates.y
     );
@@ -109,7 +126,6 @@ export const MainContent = ({ items }) => {
             <Grid item lg={5} xs={5} style={{ display: "grid" }}>
               <TextareaAutosize
                 id="#area"
-                fullWith
                 rowsMin={30}
                 placeholder="Enter your JSON"
                 defaultValue={JSON.stringify(data, null, 2)}
