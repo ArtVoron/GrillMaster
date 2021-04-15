@@ -11,6 +11,7 @@ import {
 import PropTypes from "prop-types";
 
 import { OutItemsTable } from "../../components/OutItemsTable";
+import { Packaging } from "../../algorithm/Packaging";
 
 let styles = {
   box: {
@@ -24,125 +25,37 @@ let styles = {
 };
 
 export const MainContent = ({ items }) => {
-  const [grillItems, setProducts] = useState(items.grill.grillItems);
-  const [insertedItems, setInsertedItems] = useState({ 1: [] });
   const [viewRest, setViewRest] = useState(false);
-  const [currentParams, setCurrentParams] = useState({
-    restOfHeight: items.grill.height,
-    restOfWith: items.grill.width,
-    row: 1,
-    step: 0,
-  });
+  const [restItems, setRestItems] = useState({});
 
-  let checkFigureFucn;
+  const createHtmlElement = (elements, box) => {
+    elements.forEach((element) => {
+      let div = document.createElement("div");
+      div.setAttribute(
+        "style",
+        `left:${element.x}px; top:${element.y}px; width:${element.width}px; height:${element.height}px; 
+      background-color:green; border-radius:4px; position: absolute`
+      );
 
-  const getSuitableSizeOfItems = (grullItemsArray, restOfWidth) => {
-    let sortArray = grullItemsArray.filter((arr) => arr.width <= restOfWidth);
-    const nextFigure = sortArray.find(
-      (it) =>
-        Math.abs(it.width - restOfWidth) ===
-        Math.min(...sortArray.map((it) => Math.abs(restOfWidth - it.width)))
-    );
-    checkFigureFucn(nextFigure);
-    return nextFigure;
-  };
-
-  const calculateTotalHeight = (object) => {
-    let totalHeight = 0;
-    Object.entries(object).forEach(([key, value]) => {
-      totalHeight = totalHeight + value.find((i) => Math.max(i.height)).height;
+      box.appendChild(div);
     });
-    return totalHeight < items.grill.height ? totalHeight : items.grill.height;
-  };
-
-  checkFigureFucn = function (nextFigure) {
-    if (nextFigure) {
-      let correctedParams = {
-        restOfHeight: currentParams.restOfHeight,
-        restOfWith: currentParams.restOfWith - nextFigure.width,
-        row: currentParams.row,
-        step: currentParams.step + 1,
-      };
-
-      setInsertedItems((insertedItem) => {
-        let obj = { ...insertedItem };
-        obj[currentParams.row] = [
-          ...obj[currentParams.row],
-          Object.assign({}, nextFigure),
-        ];
-        return obj;
-      });
-      setCurrentParams(correctedParams);
-      return nextFigure;
-    } else {
-      if (currentParams.step === 0) {
-        alert("No solutions to sort!");
-      } else {
-        if (items.grill.height <= calculateTotalHeight(insertedItems)) {
-          setViewRest(true);
-          alert("The END!");
-        } else {
-          let correctedParams = {
-            restOfHeight:
-              items.grill.height - calculateTotalHeight(insertedItems),
-            restOfWith: items.grill.width,
-            row: currentParams.row + 1,
-            step: 0,
-          };
-          setCurrentParams(correctedParams);
-          setInsertedItems((insert) => {
-            let obj = { ...insert };
-            obj[currentParams.row + 1] = [];
-            return obj;
-          });
-          alert("Next row!");
-        }
-      }
-    }
-  };
-
-  const changeCounterOfItem = (grillItemsArray, figure) => {
-    for (let i = 0; i < grillItemsArray.length; i++) {
-      if (grillItemsArray[i].title === figure.title) {
-        if (grillItemsArray[i].count > 1) {
-          debugger;
-          grillItemsArray[i].count--;
-        } else {
-          debugger;
-          grillItemsArray = grillItemsArray.filter((product) => product.title !== figure.title);
-        }
-      }
-    }
-    return grillItemsArray;
-  };
-
-  const createHtmlElement = (element) => {
-    let box = document.getElementById("#box");
-    let coordinates = box.getBoundingClientRect();
-    let div = document.createElement("div");
-    div.setAttribute(
-      "style",
-      `left:${
-        coordinates.left + (coordinates.width - currentParams.restOfWith)
-      }px; top:${
-        coordinates.top + (coordinates.height - currentParams.restOfHeight)
-      }px; width:${element.width}px; height:${
-        element.height
-      }px; background-color:green; border-radius:4px; position: absolute`
-    );
-    box.appendChild(div);
   };
 
   const onClick = () => {
-      let suitableObj = getSuitableSizeOfItems(
-        grillItems,
-        currentParams.restOfWith
-      );
-      if (suitableObj) {
-        createHtmlElement(suitableObj);
-        let correctedProducts = changeCounterOfItem(grillItems, suitableObj);
-        setProducts(correctedProducts);
-      }
+    let box = document.getElementById("#box");
+    let coordinates = box.getBoundingClientRect();
+
+    let resultBoxes = Packaging(
+      items.grill.grillItems,
+      items.grill.width,
+      items.grill.height,
+      coordinates.x,
+      coordinates.y
+    );
+
+    createHtmlElement(resultBoxes.finalBoxes, box);
+    setRestItems(resultBoxes.boxes);
+    setViewRest(true);
   };
 
   return (
@@ -167,7 +80,7 @@ export const MainContent = ({ items }) => {
                   >
                     Items out of grill
                   </Typography>
-                  <OutItemsTable items={viewRest ? grillItems : null} />
+                  <OutItemsTable items={viewRest ? restItems : null} />
                 </CardContent>
               </Card>
             </Grid>
