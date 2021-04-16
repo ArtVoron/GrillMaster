@@ -46,7 +46,7 @@ export const MainContent = ({ items }) => {
     }
   };
 
-  const sort = (grillItems, grillWidth, grillHeight, startX, startY) => {
+  const sort = (grillItems, grillWidth, grillHeight) => {
     var n_box = grillItems.length;
     var fabric_width = grillWidth;
     var fabric_height = grillHeight;
@@ -99,8 +99,6 @@ export const MainContent = ({ items }) => {
       boxes,
       fabric_width,
       fabric_height,
-      startX,
-      startY,
       1,
       0,
       0,
@@ -170,8 +168,6 @@ export const MainContent = ({ items }) => {
     let grillItems;
     let width;
     let height;
-    const box = document.getElementById("#box");
-    const coordinates = box.getBoundingClientRect();
 
     try {
       mainData = parseTextArea();
@@ -185,7 +181,7 @@ export const MainContent = ({ items }) => {
       height = items.grill.height;
     }
 
-    sort(grillItems, width, height, coordinates.x, coordinates.y);
+    sort(grillItems, width, height);
   };
 
   return (

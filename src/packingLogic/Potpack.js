@@ -2,8 +2,6 @@ export const Potpack = (
   boxes,
   fabric_width,
   fabric_height,
-  startX,
-  startY,
   hspace,
   vspace,
   hfuse,
