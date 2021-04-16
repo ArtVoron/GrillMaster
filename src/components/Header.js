@@ -1,4 +1,3 @@
-
 import { Card, CardContent, Grid, Typography } from "@material-ui/core";
 
 export const Header = () => {
@@ -7,8 +6,10 @@ export const Header = () => {
       <Card>
         <CardContent>
           <Grid container spacing={3}>
-            <Typography variant="h5">Grillmaster</Typography>
+            <Grid item lg={12} xs={12}>
+              <Typography variant="h5">Grillmaster</Typography>
             </Grid>
+          </Grid>
         </CardContent>
       </Card>
     </Grid>
